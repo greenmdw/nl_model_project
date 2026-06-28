@@ -342,7 +342,7 @@ class TextCNN(nn.Module):
         dataset_url = "https://raw.githubusercontent.com/mohitgupta-omg/Kaggle-SMS-Spam-Collection-Dataset-/master/spam.csv"
 
         # 로컬에 저장할 CSV 파일명을 지정합니다.
-        dataset_path = "spam.csv"
+        dataset_path = "../data/spam.csv"
 
         # spam.csv 파일이 없으면 인터넷에서 내려받습니다.
         if not os.path.exists(dataset_path):

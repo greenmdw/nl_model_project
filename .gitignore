@@ -50,3 +50,11 @@ models/
 
 # Environment variable files
 .env
+
+# PyTorch Lightning
+src/lightning_logs/
+assignment/lightning_logs
+
+# checkpoint
+*.ckpt
+

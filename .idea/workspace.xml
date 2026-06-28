@@ -1,14 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="ALL" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="a8578bc4-213d-492c-83bf-d2ac2ec9b967" name="변경" comment="" />
+    <list default="true" id="a8578bc4-213d-492c-83bf-d2ac2ec9b967" name="변경" comment="">
+      <change beforePath="$PROJECT_DIR$/assignment/lstm_imdb_lightning.py" beforeDir="false" afterPath="$PROJECT_DIR$/assignment/lstm_imdb_lightning.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="32" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -17,10 +30,69 @@
     <commands />
     <urls />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 7,
-  "fromUser": false
-}]]></component>
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="1.0049887875245063" />
+      <entry key="MS500" value="1.532660728769406" />
+      <entry key="S2" value="2.425231033221987" />
+      <entry key="S5" value="2.7453713601264567" />
+      <entry key="S10" value="2.8697848136625366" />
+      <entry key="S30" value="3.0728738695802416" />
+      <entry key="S60" value="3.320694979225146" />
+      <entry key="M2" value="3.5745923596840887" />
+      <entry key="M5" value="3.802968017057852" />
+      <entry key="M10" value="3.9255078221643767" />
+      <entry key="M15" value="4.278787608472438" />
+      <entry key="M30" value="8.141930586572059" />
+      <entry key="H1" value="18.434642436719745" />
+      <entry key="H2" value="30.873580075879243" />
+      <entry key="H4" value="40.9972382723429" />
+      <entry key="D1" value="110.85515521528148" />
+      <entry key="W1" value="198.42299812165925" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="0.0" />
+      <entry key="S2" value="0.0" />
+      <entry key="S5" value="0.0" />
+      <entry key="S10" value="8.907684177245707E-194" />
+      <entry key="S30" value="4.4660296657605925E-65" />
+      <entry key="S60" value="6.682835974165902E-33" />
+      <entry key="M2" value="8.174861450915178E-17" />
+      <entry key="M5" value="3.672756705809205E-7" />
+      <entry key="M10" value="6.060327306185041E-4" />
+      <entry key="M15" value="0.0071613910108424715" />
+      <entry key="M30" value="0.08462500227971914" />
+      <entry key="H1" value="0.29090376811026697" />
+      <entry key="H2" value="0.5393653623370015" />
+      <entry key="H4" value="0.7399944493328464" />
+      <entry key="D1" value="2.002092413847233" />
+      <entry key="W1" value="3.5756513741141016" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="0.30006931696601413" />
+      <entry key="MS500" value="1.1715580796493215" />
+      <entry key="S2" value="2.263180544044821" />
+      <entry key="S5" value="2.670392396553731" />
+      <entry key="S10" value="2.8303103568313084" />
+      <entry key="S30" value="3.0582813833271696" />
+      <entry key="S60" value="3.3123900696818573" />
+      <entry key="M2" value="3.5699133028225902" />
+      <entry key="M5" value="3.8009060940644415" />
+      <entry key="M10" value="3.9250408273969932" />
+      <entry key="M15" value="4.285204026768785" />
+      <entry key="M30" value="8.22605778822572" />
+      <entry key="H1" value="18.725135218659144" />
+      <entry key="H2" value="31.412642599699872" />
+      <entry key="H4" value="41.737036742883426" />
+      <entry key="D1" value="112.85701487976102" />
+      <entry key="W1" value="201.99857604970975" />
+    </decayedShown>
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7,
+  &quot;fromUser&quot;: false
+}</component>
   <component name="ProjectId" id="3FeW720K7NeSYfXCV7FxI7KMJJk" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -29,21 +101,37 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python.20260626_self_study_lstm_lightning.executor": "Run",
+    "Python.lstm_imdb_lightning.executor": "Run",
+    "Python.test.executor": "Run",
     "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "team01",
     "junie.onboarding.icon.badge.shown": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "ml.llm.LLMThirdPartyAiProvidersConfigurable",
     "to.speed.mode.migration.done": "true",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\llm_workspace\20260626_llm_nlp\data" />
+    </key>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-c59985aa861c-c2ffad84badb-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-261.24374.152" />
+        <option value="bundled-js-predefined-d6986cc7102b-31caf2ab9e3c-JavaScript-PY-261.25134.203" />
+        <option value="bundled-python-sdk-245168a56dbd-c2ffad84badb-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-261.25134.203" />
       </set>
     </attachedChunks>
   </component>
@@ -55,10 +143,16 @@
       <option name="presentableId" value="Default" />
       <updated>1782435844289</updated>
       <workItem from="1782435845362" duration="2000" />
+      <workItem from="1782524790337" duration="30619000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/20260626_llm_nlp$20260626_self_study_lstm_lightning.coverage" NAME="20260626_self_study_lstm_lightning 커버리지 결과" MODIFIED="1782541085110" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/20260626_llm_nlp$test.coverage" NAME="test 커버리지 결과" MODIFIED="1782530516428" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
+    <SUITE FILE_PATH="coverage/20260626_llm_nlp$lstm_imdb_lightning.coverage" NAME="lstm_imdb_lightning 커버리지 결과" MODIFIED="1782651628650" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
   </component>
 </project>
