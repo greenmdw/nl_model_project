@@ -1,8 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-동원 assignment
-"""
-# 0. import
 import os
 import torch
 import torch.nn as nn
@@ -10,200 +5,210 @@ import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader, random_split
 from torch.optim import Adam
 from torch.nn.utils.rnn import pad_sequence
-import pytorch_lightening as pl
+import pytorch_lightning as pl
 from torchmetrics import Accuracy, F1Score, Precision, Recall
 from collections import Counter
 
-# 1. 기본 설정 (하이퍼파라미터 및 경로)
+# ---------------------------------------------------------------------
+# 1. 하이퍼파라미터 및 경로 설정
+# ---------------------------------------------------------------------
+# 현재 파일 위치 기준으로 상위 혹은 다른 폴더에 있는 data/ratings.txt를 안전하게 가리킵니다.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_PATH = os.path.join(BASE_DIR, 'data', 'ratings.txt')
 
-BATCH_SIZE = 65
-MAX_LENGTH = 50
+BATCH_SIZE = 64
+MAX_LENGTH = 50  # 한글 리뷰는 보통 문장이 짧으므로 50 정도가 적당합니다.
 EMBEDDING_DIM = 200
 LSTM_HIDDEN_SIZE = 100
 LEARNING_RATE = 0.001
 EPOCHS = 5
 
-# 2. 한글 데이터 전처리 및 전용 DATASET 클래스 정으
+
+# ---------------------------------------------------------------------
+# 2. 한글 데이터 전처리 및 전용 Dataset 클래스 정의
+# ---------------------------------------------------------------------
 class RatingsDataset(Dataset):
     def __init__(self, data_path, vocab=None, max_vocab_size=20000):
         self.labels = []
         self.texts = []
 
-        # 파일 읽기 ('\t' 탭 구분자)
+        # 파일 읽기 (탭 구분자 \t 사용)
         with open(data_path, 'r', encoding='utf-8') as f:
-            next(f)             # 헤더 줄 skip
+            next(f)  # 헤더 줄 skip (id, document, label)
             for line in f:
                 parts = line.strip().split('\t')
-                if len(parts) == 3:         # 3개 조각으로 쪼개진 것이 정상 데이터(id, text, label)
+                if len(parts) == 3:  # 정상적인 데이터만 파싱
                     _, document, label = parts
-                    if document.strip():        # 빈 문자열 제외
+                    if document.strip():  # 빈 문자열 제외
                         self.labels.append(int(label))
-                        self.texts.append(document.split())         # 기본 공백 토큰화
+                        self.texts.append(document.split())  # 기본 공백 토큰화
 
-        # 단어 사전(vocab) 구축
+        # 단어 사전(Vocabulary) 구축
         if vocab is None:
-            # self.text에 담긴 모든 문장을 1차원 리스트로 쫙 펼침
             all_tokens = [token for text in self.texts for token in text]
-            # Counter를 써서 각 단어가 전체에 몇 번 등장했는지 빈도수 체크
             token_counts = Counter(all_tokens)
             vocab_list = [token for token, _ in token_counts.most_common(max_vocab_size)]
 
-            # 인덱스 부여하는 딕셔너리
-            # 0, 1은 특수 토큰용이므로 일반 단어는 +2로 저장
+            # 특수 토큰 지정 (<pad>=0, <unk>=1)
             self.vocab = {token: idx + 2 for idx, token in enumerate(vocab_list)}
-            # 특수 토큰 지정 (<pad>=0 : 가짜단어 , <unk>=1: 사전에 없는 단어)
             self.vocab['<pad>'] = 0
             self.vocab['<unk>'] = 1
-
         else:
-            # 검증 테스트 할 때 사용
             self.vocab = vocab
 
-        # 자주 쓰는 특수 토큰의 번호는 꺼내기 쉽게 미리 변수로 등록
         self.pad_index = self.vocab['<pad>']
         self.unk_index = self.vocab['<unk>']
 
     def __len__(self):
-        """총 리뷰가 몇 개인지 개수 반환"""
         return len(self.labels)
 
     def text_to_tensor(self, tokenized_text):
-        """vocab에 있으면 고유번호, 없으면 unk"""
+        # 단어 사전에 없으면 <unk>(1)로 매핑
         indexed = [self.vocab.get(token, self.unk_index) for token in tokenized_text]
-
-        # 파이썬 리스트를 PyTorch 모델이 연산할 수 있게 정수형 텐서로 변환
         return torch.tensor(indexed, dtype=torch.long)
 
     def __getitem__(self, idx):
-        """DataLoader가 요청한 idx에 있는 값 꺼내주는 것"""
         return self.labels[idx], self.text_to_tensor(self.texts[idx])
 
-# 3. DataLoader를 위한 collate_fn (동적 패딩)
-def collate_batch(batch):
-    """
-    DataLoader가 64개 샘플을 무작위로 뽑아와서 이 함수에 실행
-    64개의 데이터를 행렬로 조립
-    """
-    label_list = []
-    text_list = []
 
-    # 1. 튜플 데이터를 각각의 리스트로 분리
+# 데이터셋 로드 및 분할
+full_dataset = RatingsDataset(DATA_PATH)
+vocab_size = len(full_dataset.vocab)
+pad_index = full_dataset.pad_index
+
+# 훈련용 / 검증용 8:2 분할
+train_size = int(0.8 * len(full_dataset))
+val_size = len(full_dataset) - train_size
+train_data, val_data = random_split(full_dataset, [train_size, val_size])
+
+
+# ---------------------------------------------------------------------
+# 3. DataLoader를 위한 collate_fn 구현 (동적 패딩)
+# ---------------------------------------------------------------------
+def collate_batch(batch):
+    label_list, text_list = [], []
     for label, text_tensor in batch:
         label_list.append(label)
         text_list.append(text_tensor)
 
-    # 2. 라벨을 행렬로 통합
-    # 파이썬 리스트였던 라벨들을 1차원 텐서로
     labels = torch.tensor(label_list, dtype=torch.long)
 
-    # 3. 동적 패딩(Dynamic Padding)
-    # 64개 문장중 (이번 배치내에서) 가장 긴 문장을 찾음
-    # 보다 짧은 문장들은 <pad> 로 채움
+    # 배치 내 가장 긴 문장 기준으로 pad 값(0) 부여
     texts = pad_sequence(text_list, batch_first=True, padding_value=pad_index)
 
-    # 4. 과도하게 긴 문장 차단
+    # 지정한 max_length를 넘어가면 잘라내어 안전성 확보
     if texts.size(1) > MAX_LENGTH:
         texts = texts[:, :MAX_LENGTH]
 
-    # 완성된 텍스트 행렬과 정답 행렬을 튜플 형태로 리턴
     return texts, labels
 
-# 공급망 배치 인프라 구축
+
 train_loader = DataLoader(train_data, batch_size=BATCH_SIZE, shuffle=True, collate_fn=collate_batch)
-# 검증용 데이터 로더
 val_loader = DataLoader(val_data, batch_size=BATCH_SIZE, shuffle=False, collate_fn=collate_batch)
 
 
-# 4. RatingsLSTMModel 정의
-class RatingsLSTMModel(pl.LighteningModule):
+# ---------------------------------------------------------------------
+# 4. Refactored 다중 지표 및 마지막 시점 추출 RNN Model
+# ---------------------------------------------------------------------
+class RatingsLSTMModel(pl.LightningModule):
     def __init__(self, vocab_size, pad_index, embedding_dim=200, lstm_hidden_size=100, output_size=2):
         super().__init__()
-
-        # 하이퍼파라미터를 모델 내부에 자동으로 저장하여 나중에 꺼내쓰기 쉽게
         self.save_hyperparameters()
 
-        # 1. embedding 레이어: 단어 번호를 의미를 가진 밀집 벡터로 변환
-        # padding_idx=pad_index를 주어 0번 토큰은 학습 과정에서 무시하고 항상 0 벡터로 유지
         self.embedding = nn.Embedding(
             num_embeddings=vocab_size,
             embedding_dim=embedding_dim,
             padding_idx=pad_index
         )
 
-        # 2. LSTM 레이어: 문장을 앞에서부터 읽으며 어순과 문맥 정보를 기억 공간에 누적
-        # Batch_first=true 레이아웃 필수. 입력 데이터의 첫 번째 축이 배치 크기임을 명시
         self.lstm = nn.LSTM(
             input_size=embedding_dim,
             hidden_size=lstm_hidden_size,
             batch_first=True
         )
 
-        # 3. Linear 레이어: LSTM이 최종 요약한 100 차원 문맥을 받아 클래스 개체로 변환
+        # 은닉 상태(Hidden Size) 크기를 받아 최종 긍부정 분류
         self.lin = nn.Linear(lstm_hidden_size, output_size)
-
-        # 오차를 계산할 손실 함수 (이진 분류이므로 CrossEntorpyLoss)
         self.loss_function = nn.CrossEntropyLoss()
 
-        # 4. 훈련 및 검증용 지표 설정
-        # task='multiclass'와 클래스 개수(2)를 지정하여 0과 1 분류하는 지표 세팅
-        self.train_accuracy = Accuracy(task='multiclass', num_classes=output_size)
-        self.val_accuracy = Accuracy(task='multiclass', num_classes=output_size)
-        self.val_f1 = F1Score(task='multiclass', num_classes=output_size)
-        self.val_precision = Precision(task='multiclass', num_classes=output_size)
-        self.val_recall = Recall(task='multiclass', num_classes=output_size)
+        # 다중 평가지표 정의 (정확도, F1, 정밀도, 재현율)
+        self.train_accuracy = Accuracy(task="multiclass", num_classes=output_size)
+        self.val_accuracy = Accuracy(task="multiclass", num_classes=output_size)
+
+        self.val_f1 = F1Score(task="multiclass", num_classes=output_size)
+        self.val_precision = Precision(task="multiclass", num_classes=output_size)
+        self.val_recall = Recall(task="multiclass", num_classes=output_size)
 
     def forward(self, x: torch.Tensor):
-
+        # 1. Embedding 레이어 통과 -> (Batch, Seq_Len, Embedding_Dim)
         x = self.embedding(x)
-        # (64, 50) -> (64, 50, 200)  [batch_size, seq_len, embedding_dim]
 
-        # 50개 단어 순서대로 훑으며 주변 문맥을 반영한 100차원 문맥으로 변경
-        # _ 자리는 최종 기억 상태(call state)인데 여기선 안써서 버림
-        # (64, 50, 200) - > (64, 50, 100)  [Batch, seq_len, hidden_size]
+        # 2. LSTM 레이어 통과 -> (Batch, Seq_Len, Hidden_Size)
         x, _ = self.lstm(x)
 
-        # 출력 슬라이싱
-        # 모든 맥락이 최종 압축된 맨 마지막 단어만 슬라이싱
-        # (64, 50, 100) -> (64, 100) [batch, hidden_size]
+        # ⭐ [수정 핵심] sum 방식을 버리고, 문맥이 모두 압축된 '맨 마지막 단어 시점'만 도려냅니다.
+        # 차원 변화: (Batch, Seq_Len, Hidden_Size) -> (Batch, Hidden_Size)
         x = x[:, -1, :]
 
-        # ELU 적용
-        # 차원 유지, 알맹이 값만 필터링
+        # 3. 활성화 함수 거치며 비선형 특징 부각
         x = F.elu(x)
 
-        # 최종 출력층 linear 통과
-        # 100개의 문맥 특징을 조합해 최종 2개의 숫자로 결론
-        # (64, 100) -> (64, 2) [Batch, output_size]
+        # 4. 최종 출력층 통과 -> (Batch, Output_Size)
         x = self.lin(x)
-
         return x
 
-# 5. Refectored 다중 지표 및 마지막 시점 추출 RNN Model
     def training_step(self, batch, batch_idx):
         x, y = batch
-        # 1. 배치에서 x와 y를 분리
+        y_hat = self(x)
 
-        # 2. forward 함수를 호출하며 yhat 계산
-        y_hat = self(x)         # 크기 (64, 2)
+        loss = self.loss_function(y_hat, y)
+        train_acc = self.train_accuracy(y_hat, y)
 
-        # 3. 예측 점수와 정답을 비교하여 틀린만큼 오차 계산
+        self.log("train_loss", loss, prog_bar=True, on_step=True, on_epoch=True)
+        self.log("train_acc", train_acc, prog_bar=True, on_step=False, on_epoch=True)
+        return loss
+
+    def validation_step(self, batch, batch_idx):
+        x, y = batch
+        y_hat = self(x)
+
         loss = self.loss_function(y_hat, y)
 
-        # 4. 이번 배치에서 훈련 정확도 계산
-        train_acc = self.train
+        # 다중 지표 기록 수행
+        val_acc = self.val_accuracy(y_hat, y)
+        val_f1 = self.val_f1(y_hat, y)
+        val_prec = self.val_precision(y_hat, y)
+        val_rec = self.val_recall(y_hat, y)
+
+        # 모니터링 진행바와 로그 테이블에 함께 기록
+        self.log("val_loss", loss, prog_bar=True)
+        self.log("val_acc", val_acc, prog_bar=True)
+        self.log("val_f1", val_f1, prog_bar=True)
+        self.log("val_precision", val_prec, prog_bar=False)
+        self.log("val_recall", val_rec, prog_bar=False)
+        return loss
+
+    def configure_optimizers(self):
+        return Adam(self.parameters(), lr=LEARNING_RATE)
 
 
+# ---------------------------------------------------------------------
+# 5. 실행 및 GPU 가속 시작
+# ---------------------------------------------------------------------
+if __name__ == "__main__":
+    # 데이터 경로가 잘 잡혔는지 검증
+    if not os.path.exists(DATA_PATH):
+        raise FileNotFoundError(f"지정된 위치에 파일이 없습니다. 경로를 확인해 주세요: {DATA_PATH}")
 
+    model = RatingsLSTMModel(vocab_size=vocab_size, pad_index=pad_index)
 
+    # GPU 가속(accelerator="gpu") 장치 자동 할당 설정 
+    trainer = pl.Trainer(
+        max_epochs=EPOCHS,
+        accelerator="gpu",
+        devices=1,
+        log_every_n_steps=10
+    )
 
-
-
-
-
-
-
-
-
-
+    print(f"🚀 네이버 영화 리뷰 LSTM 학습을 시작합니다. (대상 파일: {DATA_PATH})")
+    trainer.fit(model, train_dataloaders=train_loader, val_dataloaders=val_loader)

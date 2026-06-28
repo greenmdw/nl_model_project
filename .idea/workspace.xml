@@ -5,6 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a8578bc4-213d-492c-83bf-d2ac2ec9b967" name="변경" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/assignment/lstm_imdb_lightning.py" beforeDir="false" afterPath="$PROJECT_DIR$/assignment/lstm_imdb_lightning.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -143,7 +144,7 @@
       <option name="presentableId" value="Default" />
       <updated>1782435844289</updated>
       <workItem from="1782435845362" duration="2000" />
-      <workItem from="1782524790337" duration="30619000" />
+      <workItem from="1782524790337" duration="31981000" />
     </task>
     <servers />
   </component>
@@ -153,6 +154,6 @@
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/20260626_llm_nlp$20260626_self_study_lstm_lightning.coverage" NAME="20260626_self_study_lstm_lightning 커버리지 결과" MODIFIED="1782541085110" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/20260626_llm_nlp$test.coverage" NAME="test 커버리지 결과" MODIFIED="1782530516428" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
-    <SUITE FILE_PATH="coverage/20260626_llm_nlp$lstm_imdb_lightning.coverage" NAME="lstm_imdb_lightning 커버리지 결과" MODIFIED="1782651628650" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
+    <SUITE FILE_PATH="coverage/20260626_llm_nlp$lstm_imdb_lightning.coverage" NAME="lstm_imdb_lightning 커버리지 결과" MODIFIED="1782660266201" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/assignment" />
   </component>
 </project>
